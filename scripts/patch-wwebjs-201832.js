@@ -197,7 +197,9 @@ function applyWithGit(wwjsDir, patchFile) {
   try {
     execFileSync('git', ['-c', 'core.autocrlf=false', 'apply', '-p1', '--reject', '--ignore-whitespace', patchFile], {
       cwd: wwjsDir,
-      env: { ...process.env, GIT_CEILING_DIRECTORIES: path.dirname(wwjsDir) },
+      // LC_ALL=C: GIT_APPLY_REFUSED_INPUT matches git's English messages, and git localizes them
+      // ("entrée non reconnue" under fr_FR), which would turn a pristine-tree refusal into a hard failure.
+      env: { ...process.env, GIT_CEILING_DIRECTORIES: path.dirname(wwjsDir), LC_ALL: 'C', LANGUAGE: 'C' },
       stdio: 'pipe',
     });
   } catch (e) {
